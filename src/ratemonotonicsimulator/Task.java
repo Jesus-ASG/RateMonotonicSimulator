@@ -5,6 +5,9 @@ import static ratemonotonicsimulator.RateMonotonicSimulator.tiempo_total;
 import static ratemonotonicsimulator.RateMonotonicSimulator.tiempo_maximo;
 import static ratemonotonicsimulator.RateMonotonicSimulator.arr;
 import static ratemonotonicsimulator.RateMonotonicSimulator.index_list;
+import static ratemonotonicsimulator.RateMonotonicSimulator.ub;
+import static ratemonotonicsimulator.RateMonotonicSimulator.u;
+import static ratemonotonicsimulator.RateMonotonicSimulator.consumo;
 
 public class Task implements Runnable {
 
@@ -12,16 +15,18 @@ public class Task implements Runnable {
     public String id;
     public int c;
     public int t;
+    public int fila;
 
     // variables de control
     private int c_actual = 0;
     private int c_reposo = 0;
     public boolean completada = false;
 
-    public Task(String id, int c, int t) {
+    public Task(String id, int c, int t, int fila) {
         this.id = id;
         this.c = c;
         this.t = t;
+        this.fila = fila;
     }
 
     @Override
@@ -35,9 +40,7 @@ public class Task implements Runnable {
             }
 
             // Si es su turno
-            if (arr.get(
-                    index_list).id.equals(this.id)) {
-                System.out.println("turno de : " + id);
+            if (arr.get(index_list).id.equals(this.id)) {
 
                 // si no está completada
                 if (!completada) {
@@ -52,19 +55,18 @@ public class Task implements Runnable {
                         }
                         sleep(10);
                     }
-                    
+
                     // checar si hay espacio 
-                    if (!hayEspacio()){
+                    if (!hayEspacio()) {
                         pasarTurno();
                     }
-                    
+
                     // checar si hay tiempo
                     if (tiempo_total - 1 < tiempo_maximo) {
-                        System.out.println("" + id + " " + index_list + " " + tiempo_total);
-                        Ventana.Table.setValueAt(id, index_list, tiempo_total - 1);
-
-                        System.out.println(this.id + " en tiempo total: " + tiempo_total);
-
+                        if (tiempo_total -1 < 20)
+                            Ventana.Table.setValueAt(id, fila, tiempo_total - 1);
+                        else if (tiempo_total -1 <40)
+                            Ventana.Table1.setValueAt(id, fila, tiempo_total - 1 -20);
                         c_actual++;
                     }
 
@@ -97,11 +99,12 @@ public class Task implements Runnable {
             RateMonotonicSimulator.index_list = 0;
         }
     }
-    
-    private boolean hayEspacio(){
+
+    private boolean hayEspacio() {
         for (int i = 0; i < arr.size(); i++) {
-            if (tiempo_total%arr.get(i).t==0)
+            if (tiempo_total % arr.get(i).t == 0) {
                 return false;
+            }
         }
         return true;
     }
