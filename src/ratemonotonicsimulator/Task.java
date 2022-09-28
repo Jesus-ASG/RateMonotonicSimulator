@@ -1,13 +1,9 @@
 package ratemonotonicsimulator;
 
-import java.util.concurrent.ThreadLocalRandom;
 import static ratemonotonicsimulator.RateMonotonicSimulator.tiempo_total;
 import static ratemonotonicsimulator.RateMonotonicSimulator.tiempo_maximo;
 import static ratemonotonicsimulator.RateMonotonicSimulator.arr;
 import static ratemonotonicsimulator.RateMonotonicSimulator.index_list;
-import static ratemonotonicsimulator.RateMonotonicSimulator.ub;
-import static ratemonotonicsimulator.RateMonotonicSimulator.u;
-import static ratemonotonicsimulator.RateMonotonicSimulator.consumo;
 
 public class Task implements Runnable {
 
@@ -19,7 +15,6 @@ public class Task implements Runnable {
 
     // variables de control
     private int c_actual = 0;
-    private int c_reposo = 0;
     public boolean completada = false;
 
     public Task(String id, int c, int t, int fila) {
@@ -32,40 +27,32 @@ public class Task implements Runnable {
     @Override
     public void run() {
         while (tiempo_total <= tiempo_maximo) {
-            //System.out.println(taux);
-
             // Setear como no completada cada periodo
-            if (tiempo_total % t == 0) {
+            if (tiempo_total % t == 0) 
                 completada = false;
-            }
 
             // Si es su turno
-            if (arr.get(index_list).id.equals(this.id)) {
+            if (arr.get(index_list).id.equals(this.id)){
 
                 // si no está completada
                 if (!completada) {
-                    // si tiene espacio delante --> hace una unidad
-                    //if ((tiempo_total + 1) % t != 0) {
-
                     // esperar a que el reloj cambie
                     int ant = tiempo_total;
                     while (true) {
-                        if (ant != tiempo_total) {
+                        if (ant != tiempo_total) 
                             break;
-                        }
-                        sleep(10);
+                        sleep(1);
                     }
 
                     // checar si hay espacio 
-                    if (!hayEspacio()) {
+                    if (!hayEspacio())
                         pasarTurno();
-                    }
 
                     // checar si hay tiempo
                     if (tiempo_total - 1 < tiempo_maximo) {
-                        if (tiempo_total -1 < 20)
+                        if (tiempo_total -1 < 20) // Mostrar en tabla 1
                             Ventana.Table.setValueAt(id, fila, tiempo_total - 1);
-                        else if (tiempo_total -1 <40)
+                        else if (tiempo_total -1 <40) // Mostrar en tabla 2
                             Ventana.Table1.setValueAt(id, fila, tiempo_total - 1 -20);
                         c_actual++;
                     }
@@ -76,15 +63,9 @@ public class Task implements Runnable {
                         c_actual = 0;
                         pasarTurno();
                     }
-                    //} // de no tener espacio debe pasar el turno
-                    /*else {
-                        pasarTurno();
-                    }*/
                 } // de estar completa debe marcarse como completa y pasar turno
-                else {
+                else
                     pasarTurno();
-                }
-
             }
             sleep(10);
         }
@@ -92,28 +73,24 @@ public class Task implements Runnable {
     }
 
     private void pasarTurno() {
-
-        if (RateMonotonicSimulator.index_list + 1 < RateMonotonicSimulator.arr.size()) {
-            RateMonotonicSimulator.index_list++;
+        if (index_list + 1 < arr.size()) {
+            index_list++;
         } else {
-            RateMonotonicSimulator.index_list = 0;
+            index_list = 0;
         }
     }
 
     private boolean hayEspacio() {
-        for (int i = 0; i < arr.size(); i++) {
-            if (tiempo_total % arr.get(i).t == 0) {
+        for (int i = 0; i < arr.size(); i++)
+            if (tiempo_total % arr.get(i).t == 0)
                 return false;
-            }
-        }
         return true;
     }
 
     private void sleep(int millis) {
         try {
             Thread.sleep(millis);
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 
 }
